@@ -1,0 +1,127 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Well Cost Estimator</title>
+    <!--
+      This is a link to the Tailwind CSS CDN.
+      It provides a powerful set of utility classes for building a modern, responsive design.
+    -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!--
+      We use the 'Inter' font from Google Fonts for a clean, modern look.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen p-4">
+
+    <!--
+      Main container for the application.
+      The styling centers the content and adds a clean, card-like appearance.
+    -->
+    <div class="bg-white p-8 md:p-12 rounded-xl shadow-2xl w-full max-w-lg">
+
+        <h1 class="text-3xl md:text-4xl font-bold text-center text-indigo-600 mb-6">
+            Well Cost Estimator
+        </h1>
+        <p class="text-center text-gray-600 mb-8">
+            This tool provides a basic estimate of drilling costs based on well depth and drilling days.
+        </p>
+
+        <!--
+          The main form with input fields for the user.
+        -->
+        <form id="cost-form" class="space-y-6">
+            <div>
+                <label for="wellDepth" class="block text-sm font-medium text-gray-700">Well Depth (in meters)</label>
+                <input type="number" id="wellDepth" name="wellDepth" placeholder="e.g., 2500" class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-300">
+            </div>
+            <div>
+                <label for="drillingDays" class="block text-sm font-medium text-gray-700">Drilling Days</label>
+                <input type="number" id="drillingDays" name="drillingDays" placeholder="e.g., 30" class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-300">
+            </div>
+
+            <!--
+              The button to trigger the calculation.
+              Note that it is a 'button' element, and we will prevent the default form submission.
+            -->
+            <button type="submit" id="calculate-btn" class="w-full py-3 px-4 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-300">
+                Calculate Cost
+            </button>
+        </form>
+
+        <!--
+          The result section, which is hidden initially and will be displayed by JavaScript.
+        -->
+        <div id="result-container" class="mt-8 pt-6 border-t-2 border-gray-200" style="display:none;">
+            <h3 class="text-xl font-bold text-gray-900 mb-4 text-center">Estimated Cost</h3>
+            <div class="text-center text-lg font-medium text-green-700 p-4 bg-green-50 rounded-lg">
+                Total Estimated Cost: <span id="total-cost" class="font-bold text-2xl ml-2"></span>
+            </div>
+        </div>
+    </div>
+
+    <!--
+      JavaScript section for the calculation logic.
+      This script runs directly in the browser.
+    -->
+    <script>
+        // Get references to the HTML elements we need to interact with
+        const form = document.getElementById('cost-form');
+        const wellDepthInput = document.getElementById('wellDepth');
+        const drillingDaysInput = document.getElementById('drillingDays');
+        const resultContainer = document.getElementById('result-container');
+        const totalCostSpan = document.getElementById('total-cost');
+        
+        // Define our constant values for the cost calculation.
+        // You can change these values to be more realistic if you want.
+        const COST_PER_METER = 500; // Cost in USD per meter of drilling
+        const DAILY_COST = 20000;   // Cost in USD per day of drilling
+
+        // Add a 'submit' event listener to the form.
+        // This function will run when the 'Calculate' button is clicked.
+        form.addEventListener('submit', function(event) {
+            // Prevent the form from submitting in the traditional way (reloading the page).
+            event.preventDefault();
+
+            // Get the values from the input fields.
+            const depth = parseFloat(wellDepthInput.value);
+            const days = parseFloat(drillingDaysInput.value);
+
+            // Validate the inputs to make sure they are valid numbers.
+            if (isNaN(depth) || isNaN(days) || depth <= 0 || days <= 0) {
+                totalCostSpan.textContent = "Please enter valid numbers.";
+                resultContainer.style.display = 'block';
+                resultContainer.classList.remove('bg-green-50', 'text-green-700');
+                resultContainer.classList.add('bg-red-100', 'text-red-700');
+                return;
+            }
+
+            // Perform the cost calculation.
+            const totalCost = (depth * COST_PER_METER) + (days * DAILY_COST);
+
+            // Format the number to a currency string for better presentation.
+            const formattedCost = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(totalCost);
+
+            // Update the HTML to show the result and make the container visible.
+            totalCostSpan.textContent = formattedCost;
+            resultContainer.style.display = 'block';
+            resultContainer.classList.remove('bg-red-100', 'text-red-700');
+            resultContainer.classList.add('bg-green-50', 'text-green-700');
+        });
+    </script>
+
+</body>
+</html>
